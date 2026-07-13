@@ -19,6 +19,7 @@ def student_screen():
         "<h2 style='color:#31333F;text-align:center'>Login using FaceId</h2>",
     unsafe_allow_html=True
     )
+    st.space()
     photo_source = st.camera_input("Position your face in the center")
     if photo_source:
         np.array(Image.open(photo_source))
