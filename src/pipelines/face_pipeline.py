@@ -51,7 +51,7 @@ def get_trained_model():
         clf.fit(X,y)
     except ValueError:
         pass
-    return {'clf':clf,'X':X,'Y':y}
+    return {'clf':clf,'X':X,'y':y}
 
 #for new face re-run model
 def train_classifier():
@@ -67,13 +67,13 @@ def predict_attendance(class_img_np):
     model_data = get_trained_model()
     
     if not model_data:
-        return detected_student,[],0 #student,prediction,count
+        return detected_student,[],len(encodings) #student,prediction,count
     clf = model_data['clf']
     X_train = model_data['X'] #embeddings
     y_train = model_data['y'] #student_ids
     
     
-    all_students = sorted(list(set(y_train))) #all student ids
+    all_students = sorted(list(set(y_train))) #all students ids
     
     for encoding in encodings:
         if len(all_students)>=2:
@@ -88,7 +88,7 @@ def predict_attendance(class_img_np):
         
         if best_match_score <= resemblance_threshold:
             detected_student[predicted_id] = True
-    return detected_student,all_students,len(encoding)
+    return detected_student,all_students,len(encodings)
 
     
     
