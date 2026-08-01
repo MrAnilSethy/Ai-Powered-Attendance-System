@@ -14,70 +14,112 @@ from src.components.subject_card import subject_card
 
 # student dashboard
 def student_dashboard():
-    student_data = st.session_state['student_data']
-    student_id = student_data['student_id']
-    col1,col2 = st.columns(2,gap="xxlarge")
+    student_data = st.session_state["student_data"]
+    student_id = student_data["student_id"]
+
+    # Header
+    col1, col2 = st.columns(2, gap="xxlarge")
+
     with col1:
         header_dashboard()
+
     with col2:
-        st.subheader(f"""Welcome, {student_data['name']}""")
-        if st.button("Logout",type="secondary",key="logoutbtn",shortcut="control+backspace"):
+        st.subheader(f"Welcome, {student_data['name']}")
+
+        if st.button(
+            "Logout",
+            key="logoutbtn",
+            type="secondary",
+            shortcut="control+backspace",
+        ):
             st.session_state.is_logged_in = False
-            del st.session_state.student_data 
+            del st.session_state["student_data"]
             st.rerun()
-    
+
     st.space()
-    c1,c2 = st.columns(2)
+
+    # Title
+    c1, c2 = st.columns(2)
+
     with c1:
-        st.header('Your Enrolled Subject')
+        st.header("Your Enrolled Subjects")
+
     with c2:
-        if st.button('Enroll in Subject',type='primary',width='stretch'):
+        if st.button(
+            "Enroll in Subject",
+            type="primary",
+            width="stretch",
+            key="enroll_subject_btn",
+        ):
             enroll_dialog()
+
     st.divider()
-    
-    with st.spinner('Loading your enrolled subjects...'):
+
+    # Load Data
+    with st.spinner("Loading your enrolled subjects..."):
         subjects = get_student_subject(student_id)
         logs = get_student_attendance(student_id)
-        
+
+    # Attendance Statistics 
     stats_map = {}
-    
+
     for log in logs:
-        sid = log['subject_id']
-        
+        sid = log["subject_id"]
+
         if sid not in stats_map:
-            stats_map[sid] = {"total":0,"attendance":0}
-        stats_map[sid]['total']+=1
-        
-        if log['is_present']:
-            stats_map[sid]['attendance']+=1
-    
+            stats_map[sid] = {
+                "total": 0,
+                "attendance": 0,
+            }
+
+        stats_map[sid]["total"] += 1
+
+        if log["is_present"]:
+            stats_map[sid]["attendance"] += 1
+
+    # Subject Cards 
     cols = st.columns(2)
-    for i,sub_node in enumerate(subjects):          
-        sub = sub_node['subjects']
-        sid = sub['subject_id']
-        stats = stats_map.get(sid,{"total":0,"attendance":0})
-        
-        def unenroll_button():
-            if st.button('Unenroll from this course',type='tertiary',width='stretch',icon=':material/delete_forever:'):
-                unenroll_student_to_subject(student_id,sid)
+
+    for i, sub_node in enumerate(subjects):
+
+        sub = sub_node["subjects"]
+        sid = sub["subject_id"]
+
+        # Get attendance for this subject
+        stats = stats_map.get(
+            sid,
+            {
+                "total": 0,
+                "attendance": 0,
+            },
+        )
+
+        # Callback for unenroll
+        def unenroll_button(sid=sid, sub=sub):
+            if st.button(
+                "Unenroll from this course",
+                key=f"unenroll_{sid}",
+                type="tertiary",
+                width="stretch",
+                icon=":material/delete_forever:",
+            ):
+                unenroll_student_to_subject(student_id, sid)
                 st.toast(f"Unenrolled from {sub['name']} successfully")
                 time.sleep(1)
                 st.rerun()
-                
-        
-        with cols[i % 2]:         
+
+        with cols[i % 2]:
             subject_card(
-                name = sub['name'],
-                code = sub['subject_code'],
-                section = sub['section'],
-                stats = [
-                    ('🗓️','Total',stats['total']),
-                    ('✅','Attended',stats['attendance'])
+                name=sub["name"],
+                code=sub["subject_code"],
+                section=sub["section"],
+                stats=[
+                    ("🗓️", "Total", stats["total"]),
+                    ("✅", "Attended", stats["attendance"]),
                 ],
-                footer_callback=unenroll_button
+                footer_callback=unenroll_button,
             )
         
-    
     
     
     
