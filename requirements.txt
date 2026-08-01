@@ -1,3 +1,5 @@
+#Frontend library
+streamlit
 #Utilities
 numpy
 pandas
@@ -17,9 +19,6 @@ segno
 supabase
 #Hashing
 bcrypt
-
-#Frontend library
-streamlit
 
 #Voice Recognition
 librosa #deal with audio files like edit,load
