@@ -33,7 +33,7 @@ def style_background_dashboard():
 
 
 #overwrite streamlit 
-def style_base_layout():
+def style_base_layout():    
     st.markdown("""
         <style>
 
@@ -64,7 +64,7 @@ def style_base_layout():
                 font-family:'Climate Crisis', sans-serif !important;
                 font-size:1.7rem !important;
                 line-height:0.9 !important;
-                margin-bottom:0rem !important;
+                margin-bottom:0rem !important; 
             }
 
             h3,

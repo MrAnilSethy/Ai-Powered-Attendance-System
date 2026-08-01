@@ -20,3 +20,7 @@ bcrypt
 
 #Frontend library
 streamlit
+
+#Voice Recognition
+librosa #deal with audio files like edit,load
+resemblyzer #make audio embeddings foused python 3.10.0
