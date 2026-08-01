@@ -105,6 +105,16 @@ def get_student_subject(student_id):
     response = supabase.table("subject_students").select("*,subjects(*)").eq("student_id",student_id).execute()
     return response.data
 
+#delete subject
+def delete_subject(subject_id):
+    supabase.table("subjects") \
+        .delete() \
+        .eq("subject_id", subject_id) \
+        .execute()
+
+
+
+
 #get student attendance
 def get_student_attendance(student_id):
     response = supabase.table("attendance_logs").select("*,subjects(*)").eq("student_id",student_id).execute()

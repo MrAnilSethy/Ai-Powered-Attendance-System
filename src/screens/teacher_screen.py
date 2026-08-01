@@ -12,7 +12,7 @@ from src.pipelines.face_pipeline import predict_attendance
 from src.database.config import supabase
 from datetime import datetime
 import pandas as pd
-
+from src.database.db import delete_subject
 from src.components.dialog_attendance_results import attendance_result_dialog
 
 from src.components.dialog_voice_attendance import voice_attendance_dialog
@@ -181,6 +181,7 @@ def teacher_tab_take_attendance():
             voice_attendance_dialog(selected_subject_id)   
   
 # manage subjects      
+
 def teacher_tab_manage_subjects():
     teacher_id = st.session_state.teacher_data["teacher_id"]
 
@@ -193,24 +194,28 @@ def teacher_tab_manage_subjects():
         if st.button("Create New Subject", width="stretch"):
             create_subject_dialog(teacher_id)
 
-    # Get all subjects
     subjects = get_teacher_subjects(teacher_id)
 
-    if subjects:
+    if not subjects:
+        st.info("No subjects found. Create one above.")
+        return
 
-        cols = st.columns(2)  # Two cards per row
+    cols = st.columns(2)
 
-        for i, sub in enumerate(subjects):
+    for i, sub in enumerate(subjects):
 
-            stats = [
-                ("🧑‍🎓", "Students", sub["total_students"]),
-                ("📝", "Classes", sub["total_classes"]),
-            ]
+        stats = [
+            ("🧑‍🎓", "Students", sub["total_students"]),
+            ("📝", "Classes", sub["total_classes"]),
+        ]
 
-            def share_btn(sub=sub):
+        def footer_buttons(sub=sub):
+            c1, c2 = st.columns(2)
+
+            with c1:
                 if st.button(
-                    f"Share Code",
-                    key=f"share_{sub['subject_code']}",
+                    "Share",
+                    key=f"share_{sub['subject_id']}",
                     icon=":material/share:",
                     width="stretch",
                 ):
@@ -219,19 +224,26 @@ def teacher_tab_manage_subjects():
                         sub["subject_code"],
                     )
 
-            with cols[i % 2]:
-                subject_card(
-                    name=sub["name"],
-                    code=sub["subject_code"],
-                    section=sub["section"],
-                    stats=stats,
-                    footer_callback=share_btn,
-                )
+            with c2:
+                if st.button(
+                    "Delete",
+                    key=f"delete_{sub['subject_id']}",
+                    icon=":material/delete:",
+                    type="tertiary",
+                    width="stretch",
+                ):
+                    delete_subject(sub["subject_id"])   
+                    st.toast(f"{sub['name']} deleted successfully")
+                    st.rerun()
 
-    else:
-        st.info("No subjects found. Create one above.")
- 
- 
+        with cols[i % 2]:
+            subject_card(
+                name=sub["name"],
+                code=sub["subject_code"],
+                section=sub["section"],
+                stats=stats,
+                footer_callback=footer_buttons,
+            )
  
  
  
@@ -274,7 +286,7 @@ def teacher_tab_attendance_records():
     
  
     summary['Attendance Stats'] = (
-        "✅"+ summary['Present_Count'].astype(str) + " /"
+        "✅"+  summary['Present_Count'].astype(str) + " /" 
         +summary['Total_Count'].astype(str) + 'Students'
     )
     
