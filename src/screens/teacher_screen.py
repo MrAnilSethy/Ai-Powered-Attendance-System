@@ -179,46 +179,60 @@ def teacher_tab_take_attendance():
 
         if st.button('Use voice Attendance',type='primary',width='stretch',icon=':material/mic:'):
             voice_attendance_dialog(selected_subject_id)   
-        
-
- 
- 
- # manage subjects
+  
+# manage subjects      
 def teacher_tab_manage_subjects():
-    teacher_id = st.session_state.teacher_data['teacher_id']
-    col1,col2 = st.columns(2)
+    teacher_id = st.session_state.teacher_data["teacher_id"]
+
+    col1, col2 = st.columns(2)
+
     with col1:
-        st.header('Manage Subjects',width='stretch')    
-        
+        st.header("Manage Subjects")
+
     with col2:
-        if st.button('Create New Subject',width='stretch'):
+        if st.button("Create New Subject", width="stretch"):
             create_subject_dialog(teacher_id)
-    #List all Subjects
+
+    # Get all subjects
     subjects = get_teacher_subjects(teacher_id)
+
     if subjects:
-        for sub in subjects:
+
+        cols = st.columns(2)  # Two cards per row
+
+        for i, sub in enumerate(subjects):
+
             stats = [
-                ("🧑‍🎓","Students",sub['total_students']),
-                ("📝","Classes",sub['total_classes']),
-                    
+                ("🧑‍🎓", "Students", sub["total_students"]),
+                ("📝", "Classes", sub["total_classes"]),
             ]
-        def share_btn():
-            if st.button(f"Share Code:{sub['name']}",key=f"share_{sub['subject_code']}",icon=":material/share:"):
-                share_subject_dialog(sub['name'],sub['subject_code'])
-            st.space()
-                
-        subject_card(
-            name = sub['name'],
-            code = sub['subject_code'],
-            section = sub['section'],
-            stats = stats,
-            footer_callback = share_btn
-        )   
-            
+
+            def share_btn(sub=sub):
+                if st.button(
+                    f"Share Code",
+                    key=f"share_{sub['subject_code']}",
+                    icon=":material/share:",
+                    width="stretch",
+                ):
+                    share_subject_dialog(
+                        sub["name"],
+                        sub["subject_code"],
+                    )
+
+            with cols[i % 2]:
+                subject_card(
+                    name=sub["name"],
+                    code=sub["subject_code"],
+                    section=sub["section"],
+                    stats=stats,
+                    footer_callback=share_btn,
+                )
+
     else:
-        st.info("NO SUBJECTS FOUND,CREATE ONE ABOVE")
-        
-    
+        st.info("No subjects found. Create one above.")
+ 
+ 
+ 
  
  
  
