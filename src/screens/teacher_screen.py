@@ -161,7 +161,7 @@ def teacher_tab_take_attendance():
 
                         results.append({
                             "Name": student["name"],
-                            "ID": student_id,
+                            "ID": student['student_id'],
                             "Source": ", ".join(sources) if is_present else "_",
                             "Status": "✅ Present" if is_present else "❌ Absent"
                         })
